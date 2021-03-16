@@ -3,6 +3,8 @@ import 'package:rasan/core/constant/default_value.dart';
 import 'package:rasan/core/constant/strings.dart';
 import 'package:rasan/core/enum/enums.dart';
 import 'package:rasan/core/theme/app_theme.dart';
+import 'package:rasan/logic/auth/auth_controller.dart';
+import 'package:get/get.dart';
 
 Material buildLogInRegistration({
   BuildContext context,
@@ -10,22 +12,16 @@ Material buildLogInRegistration({
   AuthenticateType authenticateType,
   GlobalKey<FormState> formkey,
 }) {
+  AuthController authController = UserAuthController();
   return Material(
     child: InkWell(
-      onTap: () {
-        if (authenticateType == AuthenticateType.LogIn) {
-          if (formkey.currentState.validate()) {
-            print("Validated");
-          } else {
-            print("Not Validated");
-          }
-          //sign in code is here...
-          // AuthController controller = UserAuthController();
-          /// controller.userRegister(
-          //    authModel: AuthModel(emailAddress: 'abc', password: 'abc'));
-        } else {
-          //register code is here..
-        }
+      onTap: () async {
+        authController.userLogic(
+          context: context,
+          controller: controller,
+          authenticateType: authenticateType,
+          formkey: formkey,
+        );
       },
       child: Container(
         alignment: Alignment.center,

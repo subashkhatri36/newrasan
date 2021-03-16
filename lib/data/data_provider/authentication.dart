@@ -7,4 +7,6 @@ abstract class Authentication {
   Future<Either<String, String>> register({@required AuthModel authModel});
   Future<Either<String, String>> googleLogInandRegistration();
   Future<Either<String, String>> forgetPassword({@required String email});
+
+  Future<bool> signOut();
 }

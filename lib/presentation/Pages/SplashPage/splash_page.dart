@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:rasan/core/constant/strings.dart';
-import 'package:rasan/core/theme/app_theme.dart';
+import 'package:rasan/logic/firebase_controller.dart';
 import 'package:rasan/presentation/Pages/HomePage/home_page.dart';
 import 'package:rasan/presentation/Pages/authpage/auth_page.dart';
+import 'package:get/get.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -12,7 +13,7 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  final splashDelay = 5;
+  final splashDelay = 2;
   String _versionName = 'V1.0';
   @override
   void initState() {
@@ -26,8 +27,14 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void navigationPage() {
-    Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (BuildContext context) => AuthenticatePage()));
+    print(Get.find<FirebaseInfo>().firebaseAuth.currentUser);
+    //Get.find<FirebaseInfo>().userCredential?.user
+    if (Get.find<FirebaseInfo>().firebaseAuth.currentUser != null)
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (BuildContext context) => HomePage()));
+    else
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (BuildContext context) => AuthenticatePage()));
   }
 
   @override

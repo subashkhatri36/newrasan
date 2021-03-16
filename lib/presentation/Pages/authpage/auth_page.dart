@@ -1,30 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
+import 'package:get/get.dart';
+import 'package:get/state_manager.dart';
+
 import 'package:rasan/core/constant/default_value.dart';
 import 'package:rasan/core/constant/strings.dart';
 import 'package:rasan/core/enum/enums.dart';
-import 'package:rasan/data/model/auth/auth_failure.dart';
 import 'package:rasan/logic/auth/auth_controller.dart';
 import 'package:rasan/presentation/Pages/authpage/widget/log_and_register_button.dart';
-import 'package:get/get.dart';
 
-class AuthenticatePage extends StatefulWidget {
-  @override
-  _AuthenticatePageState createState() => _AuthenticatePageState();
-}
-
-class _AuthenticatePageState extends State<AuthenticatePage> {
-  TextEditingController emailtextEditingController;
-  TextEditingController passwordtextEditingController;
-  bool isverify = false;
-  GlobalKey<FormState> formkey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    emailtextEditingController = TextEditingController();
-    passwordtextEditingController = TextEditingController();
-    super.initState();
-  }
+class AuthenticatePage extends StatelessWidget {
+  final TextEditingController emailtextEditingController =
+      TextEditingController();
+  final TextEditingController passwordtextEditingController =
+      TextEditingController();
+  final GlobalKey<FormState> formkey = GlobalKey<FormState>();
+  final AuthController authController = UserAuthController();
+  final _userAuthController = Get.find<UserAuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +32,9 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        //close Icons
+                      },
                       child: Padding(
                         padding:
                             const EdgeInsets.all(Defaults.defaultfontsize / 2),
@@ -54,24 +47,24 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
                   ],
                 ),
                 SizedBox(height: Defaults.defaultfontsize),
+                //Logo
                 Image.asset(
                   'assets/images/logo.PNG',
                   width: 200,
                   height: 200,
                 ),
+
                 SizedBox(height: Defaults.defaultfontsize),
+                //email address
                 TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
-                    AuthFailure authFailure = new AuthFailure();
-                    if (value.length < 6) {
-                      return "Must be valid Email";
-                    } else if (!authFailure.incorrectEmail(value)) {
-                      return "Incorrect Email Address.";
-                    } else {
-                      return null;
-                    }
+                    return authController.checkEmail(value)
+                        ? null
+                        : "not Valid Email";
                   },
+                  cursorColor: Colors.white,
+                  keyboardType: TextInputType.emailAddress,
                   controller: emailtextEditingController,
                   style: TextStyle(color: Theme.of(context).primaryColor),
                   decoration: InputDecoration(
@@ -86,22 +79,21 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
                   ),
                 ),
                 SizedBox(height: Defaults.defaultfontsize),
+                //password
                 TextFormField(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (_) => passwordtextEditingController.text.isEmpty
-                      ? "Enter valid Password"
-                      : null,
-                  onChanged: (value) {
-                    if (value.length < 5) {}
+                  validator: (value) {
+                    return authController.checkPassword(value);
                   },
+                  cursorColor: Colors.white,
                   obscureText: true,
                   enableSuggestions: false,
                   autocorrect: false,
                   controller: passwordtextEditingController,
                   style: TextStyle(color: Theme.of(context).primaryColor),
                   decoration: InputDecoration(
-                    errorText:
-                        isverify ? 'Error please fill it correctly.' : null,
+                    errorStyle:
+                        TextStyle(color: Theme.of(context).primaryColor),
                     labelStyle:
                         TextStyle(color: Theme.of(context).primaryColor),
                     hintText: Strings.password,
@@ -110,6 +102,16 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
                     enabledBorder: buildOutlineInputBorder(context),
                   ),
                 ),
+                SizedBox(height: Defaults.defaultfontsize),
+
+                Obx(() => _userAuthController.isloading.value
+                    ? CircularProgressIndicator()
+                    : Text('')),
+
+                // GetX<UserAuthController>(builder: (controller) {
+                //   return Text(controller.isloading.toString());
+                // }),
+
                 SizedBox(height: Defaults.defaultfontsize),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -125,6 +127,8 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
                   ],
                 ),
                 SizedBox(height: Defaults.defaultfontsize * 2),
+
+                //Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -158,12 +162,5 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
     return OutlineInputBorder(
         borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1),
         borderRadius: BorderRadius.circular(Defaults.defaultfontsize));
-  }
-
-  @override
-  void dispose() {
-    emailtextEditingController.dispose();
-    passwordtextEditingController.dispose();
-    super.dispose();
   }
 }
